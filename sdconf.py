@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#
+# (c) 2021 by Michael Strecke
+# this program is licensed under the GPLv3, see LICENSE for details
 
 from sdjsongrab import SD_API, SDDB, SD_Config, CONFIG_FNM
 import sys

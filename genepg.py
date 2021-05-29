@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#
+# (c) 2021 by Michael Strecke
+# this program is licensed under the GPLv3, see LICENSE for details
 
 from sdjsongrab import SDDB, SD_Config, CONFIG_FNM
 from lib.util import int_to_date, int_to_datetime, int_to_xmltv_datetime, min_to_str, xml_escape, date_to_int, tab_and_vertical_splitter
