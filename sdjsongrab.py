@@ -193,6 +193,9 @@ class DebugWriter:
             self.out.close()
         self.out = None
 
+    def flush(self):
+        if self.out is not None:
+            self.out.flush()
 
     def enable_logging(self, dolog):
         if dolog:
@@ -381,6 +384,8 @@ class SD_API(DebugWriter):
             dataj = json.dumps(data).encode("utf8")
             headers['Content-Type'] = "application/json;charset=UTF-8"
 
+        self.flush()
+
         webstatus, rdat, r = self.get_url(verb, url, data=dataj, headers=headers)
 
         rc = None    # result code, 0: ok, None: no code, positive: SD error, negative: HTTP error
@@ -418,6 +423,8 @@ class SD_API(DebugWriter):
 
         self.debugout("===========")
 
+        self.flush()
+        
         if rc != 0 and show_non_zero_code:
             self.show_error(rc, dat)  # display more info on error
 
