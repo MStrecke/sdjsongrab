@@ -1616,8 +1616,10 @@ if __name__ == "__main__":
         query_stations = db.get_active_query_stations(withname=False)
 
         cfg.print_and_log("* # of stations to check:", len(query_stations), flush=True)
-        for station_id in query_stations:
-            print(station_id, db.get_station_name_from_station_id(station_id))
+
+        if args.debug:
+            for station_id in query_stations:
+                print(station_id, db.get_station_name_from_station_id(station_id))
 
         if query_stations != []:
             for query_stations_chunk in chunker(query_stations, MAX_STATIONS_IDS):
