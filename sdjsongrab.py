@@ -424,7 +424,7 @@ class SD_API(DebugWriter):
         self.debugout("===========")
 
         self.flush()
-        
+
         if rc != 0 and show_non_zero_code:
             self.show_error(rc, dat)  # display more info on error
 
@@ -1282,6 +1282,13 @@ class SDDB:
 
     @local_cursor_wrapper
     def refresh_lineups_and_stations_if_needed(self, *, cursor=None):
+        """ refresh lineups if lineup data in status does not match database
+
+        :param cursor: database cursor, defaults to None
+        :type cursor: cursor, optional
+        :return: new data has been downloaded from SD
+        :rtype: bool
+        """
         assert self.sdapi.status is not None
 
         # compare stored lineup with the one from SD
@@ -1316,7 +1323,8 @@ class SDDB:
             for lineupID in deleted_lineups:
                 self.delete_lineup_from_db(lineupID, cursor=cursor)
 
-        if (len(new_lineups) != 0) or (len(deleted_lineups) != 0) or (len(modified_lineups) != 0):
+        refresh_lineups = (len(new_lineups) != 0) or (len(deleted_lineups) != 0) or (len(modified_lineups) != 0)
+        if refresh_lineups:
             # something has changed
             # refresh local lineup
             # if a lineup had been deleted or modified missing stations will simply not being reactivated
@@ -1330,7 +1338,7 @@ class SDDB:
                 # this will also (re)activate the station
                 self.store_lineup_station(dat, cursor=cursor)
 
-        return self.get_unactive_query_stations(cursor=cursor)
+        return refresh_lineups
 
     @local_cursor_wrapper
     def get_unactive_query_stations(self, *, cursor=None):
@@ -1589,7 +1597,7 @@ if __name__ == "__main__":
             sys.exit(2)
 
         sd_api.get_status()
-        cfg.print_and_log("* # of active linupgs:", len(sd_api.status["lineups"]))
+        cfg.print_and_log("* # of active lineups:", len(sd_api.status["lineups"]))
 
         ok = sd_api.check_status()
         if not ok:
@@ -1599,7 +1607,10 @@ if __name__ == "__main__":
             cfg.log_close()
             sys.exit(11)
 
-        unactive_query_stations = db.refresh_lineups_and_stations_if_needed()
+        lineups_refreshed = db.refresh_lineups_and_stations_if_needed()
+        if lineups_refreshed:
+            cfg.print_and_log("* changes in lineups")
+        unactive_query_stations = db.get_unactive_query_stations()
         db.commit()
 
         query_stations = db.get_active_query_stations(withname=False)

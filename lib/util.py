@@ -124,3 +124,9 @@ def get_yes_no(allow_none: bool) -> bool:
         if s in ["n", "no", "0"]:
             return False
         print("Please anweser 'y' or 'n'")
+
+def bool2yesno(b: bool) -> str:
+    if b:
+        return "yes"
+    else:
+        return "no"

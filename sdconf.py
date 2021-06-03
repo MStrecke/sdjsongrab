@@ -8,7 +8,7 @@ from sdjsongrab import SD_API, SDDB, SD_Config, CONFIG_FNM
 import sys
 import argparse
 import re
-from lib.util import get_yes_no
+from lib.util import get_yes_no, bool2yesno
 
 # Error return codes
 RC_NO_SERVICES_FOUND = 1
@@ -86,10 +86,12 @@ if __name__ == "__main__":
         print("* no lineups in database, forcing lineup refresh")
 
     if force_lineup_refresh or command in ['addlineup', 'deletelineup', 'addsinglelineup'] or lineups_in_db == []:
+
         user, xpassw = cfg.get_username_xpassword()
         token = sd_api.get_token(user, xpassw)
         status = sd_api.get_status()
-        db.refresh_lineups_and_stations_if_needed()
+        lineups_refreshed = db.refresh_lineups_and_stations_if_needed()
+        print("* lineups refreshed. Changes:", bool2yesno(lineups_refreshed))
         db.commit()
 
     lineups_in_db = db.get_lineups_and_modified_date()
@@ -336,7 +338,8 @@ if __name__ == "__main__":
         dellineup = read_int(len(lineups_in_db))
         dat = sd_api.delete_lineup_from_user_account(
             lineups_in_db[dellineup-1][0])
-        unactive_querystations = db.refresh_lineups_and_stations_if_needed()
+        lineups_refreshed = db.refresh_lineups_and_stations_if_needed()
+        unactive_querystations = db.get_unactive_query_stations()
         if len(unactive_querystations) > 0:
             print("The following stations will query a schedule, but are not part of any lineup:")
             for station_id, name in unactive_querystations:
