@@ -49,6 +49,10 @@ class EpgFilter:
                 if l == "":
                     break
                 l = l.rstrip()
+                if l == "":
+                    continue
+                if l.startswith("#"):
+                    continue
                 if l.startswith("genre:"):
                     l = l[6:].strip()
                     self.conditions.append((1, l.lower()))
