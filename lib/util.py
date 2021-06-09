@@ -14,8 +14,8 @@ def sdtime_to_unixtime(s: str) -> int:
     if s is None:
         return None
     assert s.endswith('Z')
-    s = s[:-1]
-    da = datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S")
+    s = s[:-1]+'+0000'
+    da = datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S%z")
     return int(da.timestamp())
 
 
