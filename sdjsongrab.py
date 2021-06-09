@@ -490,6 +490,16 @@ class SD_API(DebugWriter):
 
         return dat
 
+    def has_expired(self):
+        assert self.status is not None
+
+        print(self.status["account"]["expires"])
+        exp = sdtime_to_unixtime(self.status["account"]["expires"])
+
+        return exp < time.time()
+
+
+
     def check_status(self):
         all_ok = True
 
@@ -1597,6 +1607,10 @@ if __name__ == "__main__":
             sys.exit(2)
 
         sd_api.get_status()
+        if sd_api.has_expired():
+            cfg.print_and_log("* Error: Your account has expired.")
+            sys.exit(12)
+
         cfg.print_and_log("* # of active lineups:", len(sd_api.status["lineups"]))
 
         ok = sd_api.check_status()
