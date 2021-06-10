@@ -493,9 +493,7 @@ class SD_API(DebugWriter):
     def has_expired(self):
         assert self.status is not None
 
-        print(self.status["account"]["expires"])
         exp = sdtime_to_unixtime(self.status["account"]["expires"])
-
         return exp < time.time()
 
 
