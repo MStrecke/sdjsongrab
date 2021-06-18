@@ -28,9 +28,13 @@ Please note: ***day*** is defined from 00:00 GMT to 23:59 GMT.  Depending on you
 
 The `filter` functions restricts the output to programs that match the conditions stored in a text file.
 
-The search itself is case-insensitive.
+The search itself is case-insensitive. The checks are performed in sequence.  The first matching condition determines the outcome.
 
 The output is in the **short** format.
+
+ * normal line: search in the title, episode title and descriptions of an entry
+ * line starting with "-": dismiss entry if text is found in the title (only the title is checked)
+ * line starting with "genre:": check it this genres has been returned by the schedule
 
 Example of a `filter file`:
 
@@ -38,10 +42,15 @@ Example of a `filter file`:
 harry potter
 star trek
 galactica
+-the simpsons
 genre: Science fiction
 ```
 
-This will filter all entries that have "harry potter" OR "star trek" OR "galactica" in the title or description, OR have the genre setting "Science fiction".  A list of possible genres (seen so far) can be obtained using:
+This will filter all entries that have "harry potter" OR "star trek" OR "galactica" in the titles or descriptions, AND NOT have "the simpsons" in its title OR have the genre setting "Science fiction".
+
+However, due to the simple compare logic the entry "harry potter and the simpsons" will get through (matches the first line) but a science fiction film with "the simpsons" in its title will be sorted out (matches the fourth line before the genre check is performed).
+
+A list of possible genres (as seen so far) can be obtained using:
 
 ```
 ./maintenance.py programs listgenres
@@ -55,11 +64,11 @@ A typical calls would be:
 ./genepg.py -f my_filter_file.txt -o favs.txt
 ```
 
-Without the option `-o` the filtered *short* listing saved to `eps.txt`.
+Without the option `-o` the filtered *short* listing is saved to `eps.txt`.
 
 # maintenance.py
 
-This script contains function around the database content... mostly.
+This script contains functions that deal with the database content... mostly.
 
 | command | remark |
 | --- | --- |

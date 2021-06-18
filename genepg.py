@@ -57,7 +57,10 @@ class EpgFilter:
                     l = l[6:].strip()
                     self.conditions.append((1, l.lower()))
                 else:
-                    self.conditions.append((0, l.lower()))
+                    if l.startswith('-'):
+                        self.conditions.append((2, l[1:].strip().lower()))
+                    else:
+                        self.conditions.append((0, l.lower()))
 
     def check(self, progdat):
         def pd(key):
@@ -75,9 +78,15 @@ class EpgFilter:
                     pd("description1000")
                 if cond_info in s.lower():
                     return True
+
             elif cond_type == 1:
                 if cond_info in pd("genres100").lower():
                     return True
+
+            elif cond_type == 2:
+                if cond_info in pd("title120").lower():
+                    return False
+
         return False
 
 class BaseDumper:
