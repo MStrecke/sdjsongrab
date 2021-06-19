@@ -20,7 +20,7 @@ import traceback
 from lib.util import sdtime_to_unixtime, date_to_int, chunker, int_to_datetime, int_to_date
 from lib.sqlhelper import Query_builder, local_cursor_wrapper
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 UTILNAME = "sdjsongrab.py"
 
 USERAGENT = "%s/%s" % (UTILNAME, __version__)

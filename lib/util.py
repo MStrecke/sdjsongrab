@@ -54,7 +54,7 @@ def int_to_xmltv_datetime(unixtime: int) -> str:
     """
     if unixtime is None:
         return None
-    return datetime.datetime.fromtimestamp(unixtime).strftime("%Y%m%d%H%M%S") + " +0000"
+    return datetime.datetime.utcfromtimestamp(unixtime).strftime("%Y%m%d%H%M%S") + " +0000"
 
 
 def min_to_str(minutes: int) -> str:
