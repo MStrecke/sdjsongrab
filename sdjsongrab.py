@@ -17,7 +17,7 @@ import argparse
 import io
 import traceback
 
-from lib.util import sdtime_to_unixtime, date_to_int, chunker, int_to_datetime, int_to_date
+from lib.util import sdtime_to_unixtime, date_to_int, chunker, int_to_utc_datetime, int_to_date
 from lib.sqlhelper import Query_builder, local_cursor_wrapper
 
 __version__ = "0.3.2"
@@ -122,7 +122,7 @@ class SD_Config:
         print(s)
 
         if self.logfile is not None:
-            self.logfile.write(int_to_datetime(time.time(), "%Y-%m-%d %H:%M:%S: "))
+            self.logfile.write(int_to_utc_datetime(time.time(), "%Y-%m-%d %H:%M:%S: "))
             self.logfile.write(s+'\n')
             if flush:
                 self.logfile.flush()
@@ -1117,7 +1117,7 @@ class SDDB:
         print("========")
         print("total:", len(res))
         for item in res:
-            print(item[0], " - last modified:", int_to_datetime(item[1], format="%Y-%m-%d %H:%M:%S"))
+            print(item[0], " - last modified:", int_to_utc_datetime(item[1], format="%Y-%m-%d %H:%M:%S"))
         numstat = self.fetchone("SELECT count(*) FROM stations", retparam="count(*)", cursor=cursor)
         active_stations = self.fetchone("SELECT count(*) FROM stations WHERE active=?", (1,), retparam="count(*)", cursor=cursor)
         query_stations = self.fetchone(
@@ -1580,7 +1580,7 @@ if __name__ == "__main__":
     waituntil = cfg.get_int('server', 'waituntil', default=0)
     if waituntil != 0:
         if waituntil > int(time.time()):
-            cfg.print_and_log("* wait delay requested until " + int_to_datetime(waituntil))
+            cfg.print_and_log("* wait delay requested until " + int_to_utc_datetime(waituntil))
             cfg.log_close()
             sys.exit(10)
 

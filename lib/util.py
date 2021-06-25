@@ -41,7 +41,15 @@ def int_to_date(day_ordinal: int, format="%Y-%m-%d") -> str:
     return datetime.date.fromordinal(day_ordinal).strftime(format)
 
 
-def int_to_datetime(unixtime: int, format="%Y-%m-%d %H:%M") -> str:
+def int_to_utc_datetime(unixtime: int, format="%Y-%m-%d %H:%M") -> str:
+    """ convert unix timestamp to format (default: YYYY-MM-DD HH:MM)
+    """
+    if unixtime is None:
+        return None
+    return datetime.datetime.utcfromtimestamp(unixtime).strftime(format)
+
+
+def int_to_local_datetime(unixtime: int, format="%Y-%m-%d %H:%M") -> str:
     """ convert unix timestamp to format (default: YYYY-MM-DD HH:MM)
     """
     if unixtime is None:
@@ -55,6 +63,15 @@ def int_to_xmltv_datetime(unixtime: int) -> str:
     if unixtime is None:
         return None
     return datetime.datetime.utcfromtimestamp(unixtime).strftime("%Y%m%d%H%M%S") + " +0000"
+
+def get_current_utc_offset() -> float:
+    # avoid using to non-standard library pytz
+
+    current_utc_time = datetime.datetime.utcnow()
+    current_utc_timestamp = current_utc_time.timestamp()
+    a = datetime.datetime.utcfromtimestamp(current_utc_timestamp)
+    b = datetime.datetime.fromtimestamp(current_utc_timestamp)
+    return (b-a).total_seconds() / 3600
 
 
 def min_to_str(minutes: int) -> str:

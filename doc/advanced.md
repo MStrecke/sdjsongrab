@@ -9,7 +9,13 @@ If you start this program without any parameters it assembles an EPG from the da
  - It lists all schedules for all marked stations (query stations) for today and the days that follow.
  - The output format is `xmltv`.
 
-All time info is in GMT
+There are two other formats:
+
+ - **simple** is for debug purposes and simply dumps the content. Time is displayed in GMT.
+ - **short** only prints start time, title, and episode title.  With this you can quickly scan the EPG.
+   - Time is displayed as local time.  However, the first day starts at 0000 GMT which
+     might be in the middle of your day.
+   - You may use filters to further narrow down the result.
 
 ## Optional parameters
 
@@ -18,11 +24,12 @@ All time info is in GMT
 |`-o` or `--output` | writes the output to the given filename. This overwrites the default file name (usually `eps.txt` or `xmltv.xml`). |
 | `-t` or `--today` | restict the output to todays schedules |
 | `-d YYYY-MM-DD` or `--date YYYY-MM-DD` | restict the output to a specific date |
-| `-s` or `--simple` | dumps all information into a simple list.  This is for debug purposes. |
-| `-x` or `--short` | concise listing showing start date and the title.  This gives a good overview. |
+| `-s` or `--simple` | dumps all information into a simple list.  Only for debugging. |
+| `-x` or `--short` | concise listing showing start date, title, and episode title. |
 | `-f filename` or `--filter filename` | searches the EPG for entries matching one of the conditions in the given filename. The output is in the **short** format. |
 
-Please note: ***day*** is defined from 00:00 GMT to 23:59 GMT.  Depending on your timezone this might be in the middle of your day.
+Please note: ***day*** and ***today*** are from 00:00 GMT to 23:59 GMT.  Depending on your timezone this can be in the middle of your day.
+
 
 ## filter
 

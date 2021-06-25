@@ -5,7 +5,7 @@
 # this program is licensed under the GPLv3, see LICENSE for details
 
 from sdjsongrab import SDDB, SD_Config, CONFIG_FNM
-from lib.util import int_to_date, int_to_datetime, int_to_xmltv_datetime, min_to_str, xml_escape, date_to_int, tab_and_vertical_splitter
+from lib.util import get_current_utc_offset, int_to_date, int_to_utc_datetime, int_to_local_datetime, int_to_xmltv_datetime, min_to_str, xml_escape, date_to_int, tab_and_vertical_splitter
 import argparse
 import urllib.parse
 import datetime
@@ -121,6 +121,8 @@ class Dumper(BaseDumper):
         self.last_station_id = None
         self.last_startdate_ord = None
 
+        self._print("Time in UTC, UTC Offset: %.1f h" % get_current_utc_offset())
+
     def add(self, station_id, station_name, startdate_ord, scheddat, progdat):
         if station_id != self.last_station_id:
             self._print("=====================")
@@ -136,7 +138,7 @@ class Dumper(BaseDumper):
             self.last_startdate_ord = startdate_ord
             self._print()
 
-        self._print(int_to_datetime(
+        self._print(int_to_utc_datetime(
             scheddat["airtime"]), min_to_str(scheddat["duration"]))
         self._print("video, audio:",scheddat["videoProperties"], scheddat["audioProperties"])
         self._print("program id:", scheddat["program_id"])
@@ -165,31 +167,42 @@ class DumperShort(BaseDumper):
         self.last_startdate_ord = None
         self.last_airtime_end = None
 
+        self.last_local_date = None
+
+        self._print("local time, UTC Offset: %.1f h" % get_current_utc_offset())
+
     def add(self, station_id, station_name, startdate_ord, scheddat, progdat):
         if self.last_airtime_end is not None and self.last_airtime_end != scheddat["airtime"]:
-            self._print("- " + int_to_datetime(self.last_airtime_end,"%H:%M"))
+            self._print("- " + int_to_local_datetime(self.last_airtime_end,"%H:%M"))
 
         if station_id != self.last_station_id:
             self._print("=====================")
             self._print("Station: %s (%s)" %
                         (station_name, station_id))
             self.last_station_id = station_id
-            self.last_startdate_ord = None
+            self.last_local_date = None
 
-        if self.last_startdate_ord != startdate_ord:
+        local_date = int_to_local_datetime(scheddat["airtime"], "%A, %Y-%m-%d")
+        if local_date != self.last_local_date:
             self._print()
-            self._print(int_to_date(startdate_ord, "%A, %Y-%m-%d"))
-            self.last_startdate_ord = startdate_ord
+            self._print(local_date)
+            self.last_local_date = local_date
             self._print()
 
-        self._print(int_to_datetime(
-            scheddat["airtime"], "%H:%M"), progdat["title120"])
+        et = progdat["episodetitle158"]
+        if et is None or et == "":
+            et = ""
+        else:
+            et = "\t(" + et + ")"
+
+        self._print(int_to_local_datetime(
+            scheddat["airtime"], "%H:%M"), progdat["title120"], et)
 
         self.last_airtime_end = scheddat["airtime"] + scheddat["duration"]
 
     def predump(self):
         if self.last_airtime_end is not None:
-            self._print("- " + int_to_datetime(self.last_airtime_end,"%H:%M"))
+            self._print("- " + int_to_utc_datetime(self.last_airtime_end,"%H:%M"))
 
 class FilterDumper(DumperShort):
     def __init__(self, filter_fnm):
