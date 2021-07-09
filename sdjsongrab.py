@@ -490,12 +490,15 @@ class SD_API(DebugWriter):
 
         return dat
 
-    def has_expired(self):
+    def seconds_to_expire(self):
         assert self.status is not None
 
         exp = sdtime_to_unixtime(self.status["account"]["expires"])
-        return exp < time.time()
+        return exp - time.time()
 
+
+    def has_expired(self):
+        return self.seconds_to_expire() < 0
 
 
     def check_status(self):
@@ -1600,7 +1603,7 @@ if __name__ == "__main__":
         token = sd_api.get_token(user, xpassw)
         if token is None:
             cfg.print_and_log("* Error: Token could not be obtained.")
-            print("Wrong credentials?")
+            print("Wrong credentials or account expired?")
             cfg.log_close()
             sys.exit(2)
 
@@ -1687,6 +1690,12 @@ if __name__ == "__main__":
         # only commit program data if they have been downloaded and processed correctly
         db.commit()
         sd_api.close()
+
+        exps = sd_api.seconds_to_expire()
+        day_exps = exps / 60.0 / 60.0 / 24.0
+        if day_exps > 0:
+            if day_exps < 10:
+                cfg.print_and_log("! Days to account expiration: %.1f" % day_exps)
 
         # check for newer version
         if sd_api.check_newer_version_available():

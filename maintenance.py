@@ -97,7 +97,7 @@ def lineup_info(args):
     token = db.sdapi.get_token(user, xpassw)
     if token is None:
         print("Token could not be obtained.")
-        print("Wrong credentials?")
+        print("Wrong credentials or account expired?")
         sys.exit(2)
 
     db.sdapi.get_status()
