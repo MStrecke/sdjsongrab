@@ -536,7 +536,7 @@ if __name__ == "__main__":
     if station_renamer is not None:
         if len(sr_renamed) != 0:
             print("* station renamer active")
-            print("renamed station:", " ,".join(sr_renamed))
+            print("renamed station:", ", ".join(sr_renamed))
 
             samenames = sr_orig_stations_with_schedules.intersection(
                 station_renamer[1])
